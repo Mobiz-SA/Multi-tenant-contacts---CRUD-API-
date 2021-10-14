@@ -14,15 +14,6 @@
     },
     {
       "type": "cosmosDB",
-      "direction": "in",
-      "name": "inputDocument",
-      "databaseName": "my-database",
-      "collectionName": "my-container1",
-      "connectionStringSetting": "CosmosDbConnectionStr",
-      "sqlQuery": "select * from c where c.id ={id} AND c.userId={userId}"
-    },
-    {
-      "type": "cosmosDB",
       "direction": "out",
       "name": "outputDocument",
       "databaseName": "my-database",
@@ -31,5 +22,5 @@
       "connectionStringSetting": "CosmosDbConnectionStr"
     }
   ],
-  "scriptFile": "../dist/UpdateContact/index.js"
+  "scriptFile": "../dist/createContacts/index.js"
 }
