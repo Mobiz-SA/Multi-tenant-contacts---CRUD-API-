@@ -6,12 +6,10 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest,
   todo
 ): Promise<void> {
-  const id = '';
-
-  const userId = '';
-  req.body = {name: 'sthe', surname: 'Darling10', phonenumber: '0413674543'};
+  req.body = {name: 'sthembi', surname: 'Mkhi', phonenumber: '0912345991'};
   const updateContact = req.body as contactRecord;
   const completed = req.body.completed;
+  context.log(context.bindings.inputDocument);
   if (context.bindings.inputDocument) {
     const contRecord = {
       id: context.bindings.inputDocument[0].id,
@@ -22,10 +20,11 @@ const httpTrigger: AzureFunction = async function (
     } as contactRecord;
     context.bindings.outputDocument = context.bindings.inputDocument[0];
     context.bindings.outputDocument.name = contRecord.name;
+    context.bindings.outputDocument.surname = contRecord.surname;
 
     context.res = {
       status: 200,
-      body: context.bindings.outputDocument.name + 'success',
+      body: context.bindings.outputDocument,
     };
   } else {
     context.res = {

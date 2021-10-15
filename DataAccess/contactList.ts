@@ -35,9 +35,9 @@ export async function getContact(
   });
 }
 
-export async function getAllContact(): Promise<contactRecord[]> {
+export async function getAllContact(userId: string): Promise<contactRecord[]> {
   const querySpec = {
-    query: `SELECT * from c `,
+    query: `SELECT * from c  where c.userId='${userId}'`,
   };
 
   const container = getCosmosDbContainer();
@@ -46,6 +46,29 @@ export async function getAllContact(): Promise<contactRecord[]> {
     .fetchAll();
 
   return contactRec.map((item) => {
+    return {
+      id: item.id,
+      userId: item.userId,
+      name: item.name,
+      surname: item.surname,
+      phonenumber: item.phonenumber,
+    } as contactRecord;
+  });
+}
+export async function checkNum(
+  phone: string,
+  userId: string
+): Promise<contactRecord[]> {
+  const querySpec = {
+    query: `SELECT * from c WHERE c.phonenumber = '${phone}' AND c.userId='${userId}'`,
+  };
+
+  const container = getCosmosDbContainer();
+  const {resources: contRec} = await container.items
+    .query(querySpec)
+    .fetchAll();
+
+  return contRec.map((item) => {
     return {
       id: item.id,
       userId: item.userId,

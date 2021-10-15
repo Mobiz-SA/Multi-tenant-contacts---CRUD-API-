@@ -12,6 +12,7 @@
   "dependencies": {
     "@azure/cosmos": "^3.14.1",
     "@types/node": "^16.10.3",
+    "guid-typescript": "^1.0.9",
     "prompt-sync": "^4.2.0"
   },
   "devDependencies": {

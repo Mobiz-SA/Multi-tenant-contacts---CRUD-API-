@@ -1,42 +1,47 @@
 import {AzureFunction, Context, HttpRequest} from '@azure/functions';
 import {contactRecord} from '../models/contact-Record';
 import {newContact} from '../models/new-Contact';
-import {getId, getUserId} from '../Common/Utils';
+import {getUserId, GuidClass, phoneValidator} from '../Common/Utils';
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  req.body = {name: 'Sthembi', surname: 'Mkize', phonenumber: '0723272358'};
+  let idValue = new GuidClass();
+  let idTemp = JSON.stringify(idValue.id);
   const newContat_ = req.body as newContact;
+  const userTemp = getUserId();
 
-  if (
-    newContat_ &&
-    newContat_.surname &&
-    newContat_.phonenumber &&
-    newContat_.name
-  ) {
-    context.bindings.outputDocument = {
-      // create a random ID
-      id: getId(),
-      userId: getUserId(),
-      name: newContat_.name,
-      surname: newContat_.surname,
-      phonenumber: newContat_.phonenumber,
-    } as contactRecord;
-    context.res = {
-      status: 201,
-      body: newContat_,
-    };
+  let numStatus = await phoneValidator(req.body.phonenumber, userTemp);
+  if (numStatus) {
+    if (newContat_ && newContat_.surname && newContat_.name) {
+      context.bindings.outputDocument = {
+        // create a random ID
+        id: idTemp.slice(10, idTemp.length - 2),
+        userId: userTemp,
+        name: newContat_.name,
+        surname: newContat_.surname,
+        phonenumber: newContat_.phonenumber.replace(/[^0-9]/g, ''),
+      } as contactRecord;
+      context.res = {
+        status: 201,
+        body: newContat_,
+      };
+    } else {
+      context.res = {
+        status: 400,
+      };
+      context.log.error(
+        'Create new contact failed, invalid input.',
+        context.invocationId,
+        JSON.stringify(newContat_)
+      );
+    }
   } else {
+    context.log('phonenumber invalid');
     context.res = {
       status: 400,
     };
-    context.log.error(
-      'Create todo item invalid input.',
-      context.invocationId,
-      JSON.stringify(newContat_)
-    );
   }
 };
 
