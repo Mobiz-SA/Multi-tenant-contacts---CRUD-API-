@@ -11,28 +11,17 @@ function getCosmosDbContainer() {
   return container;
 }
 
-export async function getContact(
-  id = '',
-  userId = ''
-): Promise<contactRecord[]> {
+export async function getContact(id = '', userId = ''): Promise<any> {
   const querySpec = {
     query: `SELECT * from c WHERE c.id = '${id}' AND c.userId='${userId}'`,
   };
 
   const container = getCosmosDbContainer();
-  const {resources: contRec} = await container.items
+  const {resources: contactRecord} = await container.items
     .query(querySpec)
     .fetchAll();
 
-  return contRec.map((item) => {
-    return {
-      id: item.id,
-      userId: item.userId,
-      name: item.name,
-      surname: item.surname,
-      phonenumber: item.phonenumber,
-    } as contactRecord;
-  });
+  return contactRecord;
 }
 
 export async function getAllContact(userId: string): Promise<contactRecord[]> {
@@ -55,7 +44,7 @@ export async function getAllContact(userId: string): Promise<contactRecord[]> {
     } as contactRecord;
   });
 }
-export async function checkNum(
+export async function isNumberInDatabase(
   phone: string,
   userId: string
 ): Promise<contactRecord[]> {
