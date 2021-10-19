@@ -1,7 +1,8 @@
 import {AzureFunction, Context, HttpRequest} from '@azure/functions';
 import {contactRecord} from '../models/contact-Record';
 import {newContact} from '../models/new-Contact';
-import {getUserId, GuidClass, phoneValidator} from '../Common/Utils';
+import {getUserId, GuidClass, isPhoneValid} from '../Common/Utils';
+import {PhoneNumberUtil} from 'google-libphonenumber';
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
@@ -9,11 +10,11 @@ const httpTrigger: AzureFunction = async function (
 ): Promise<void> {
   let idValue = new GuidClass();
   let idTemp = JSON.stringify(idValue.id);
-  const newContat_ = req.body as newContact;
-  const userTemp = getUserId();
 
-  let numStatus = await phoneValidator(req.body.phonenumber, userTemp);
-  if (numStatus) {
+  const userTemp = getUserId();
+  const newContat_ = req.body as newContact;
+  let numberStatus = await isPhoneValid(req.body.phonenumber, userTemp);
+  if (numberStatus) {
     if (newContat_ && newContat_.surname && newContat_.name) {
       context.bindings.outputDocument = {
         // create a random ID
@@ -21,10 +22,10 @@ const httpTrigger: AzureFunction = async function (
         userId: userTemp,
         name: newContat_.name,
         surname: newContat_.surname,
-        phonenumber: newContat_.phonenumber.replace(/[^0-9]/g, ''),
+        phonenumber: newContat_.phonenumber,
       } as contactRecord;
       context.res = {
-        status: 201,
+        status: 200,
         body: newContat_,
       };
     } else {
@@ -38,7 +39,7 @@ const httpTrigger: AzureFunction = async function (
       );
     }
   } else {
-    context.log('phonenumber invalid');
+    context.log('phonenumber invalid or already exist');
     context.res = {
       status: 400,
     };
