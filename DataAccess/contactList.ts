@@ -1,4 +1,4 @@
-import {CosmosClient} from '@azure/cosmos';
+import {CosmosClient, SqlParameter} from '@azure/cosmos';
 import {getUserId} from '../Common/Utils';
 import {contactRecord} from '../models/contact-Record';
 
@@ -12,26 +12,34 @@ function getCosmosDbContainer() {
 }
 
 export async function getContact(id = '', userId = ''): Promise<any> {
-  const querySpec = {
-    query: `SELECT * from c WHERE c.id = '${id}' AND c.userId='${userId}'`,
+  const container = getCosmosDbContainer();
+  const queryParams: SqlParameter[] = [
+    {name: '@userId', value: userId},
+    {name: '@id', value: id},
+  ];
+
+  const sqlQuery = {
+    query: 'SELECT * FROM c WHERE c.userId = @userId AND c.id = @id ',
+    parameters: queryParams,
   };
 
-  const container = getCosmosDbContainer();
   const {resources: contactRecord} = await container.items
-    .query(querySpec)
+    .query(sqlQuery)
     .fetchAll();
 
   return contactRecord;
 }
-
 export async function getAllContact(userId: string): Promise<contactRecord[]> {
-  const querySpec = {
-    query: `SELECT * from c  where c.userId='${userId}'`,
+  const container = getCosmosDbContainer();
+  const queryParams: SqlParameter[] = [{name: '@userId', value: userId}];
+
+  const sqlQuery = {
+    query: 'SELECT * FROM c WHERE c.userId = @userId',
+    parameters: queryParams,
   };
 
-  const container = getCosmosDbContainer();
   const {resources: contactRec} = await container.items
-    .query(querySpec)
+    .query(sqlQuery)
     .fetchAll();
 
   return contactRec.map((item) => {
@@ -48,22 +56,21 @@ export async function isNumberInDatabase(
   phone: string,
   userId: string
 ): Promise<contactRecord[]> {
-  const querySpec = {
-    query: `SELECT * from c WHERE c.phonenumber = '${phone}' AND c.userId='${userId}'`,
+  const container = getCosmosDbContainer();
+  const queryParams: SqlParameter[] = [
+    {name: '@userId', value: userId},
+    {name: '@phone', value: phone},
+  ];
+
+  const sqlQuery = {
+    query:
+      'SELECT * FROM c WHERE c.userId = @userId AND c.phonenumber = @phone ',
+    parameters: queryParams,
   };
 
-  const container = getCosmosDbContainer();
-  const {resources: contRec} = await container.items
-    .query(querySpec)
+  const {resources: contactRecord} = await container.items
+    .query(sqlQuery)
     .fetchAll();
 
-  return contRec.map((item) => {
-    return {
-      id: item.id,
-      userId: item.userId,
-      name: item.name,
-      surname: item.surname,
-      phonenumber: item.phonenumber,
-    } as contactRecord;
-  });
+  return contactRecord;
 }
