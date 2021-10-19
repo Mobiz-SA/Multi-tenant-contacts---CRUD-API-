@@ -55,7 +55,7 @@ export async function getAllContact(userId: string): Promise<contactRecord[]> {
 export async function isNumberInDatabase(
   phone: string,
   userId: string
-): Promise<contactRecord[]> {
+): Promise<any> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [
     {name: '@userId', value: userId},
@@ -63,8 +63,7 @@ export async function isNumberInDatabase(
   ];
 
   const sqlQuery = {
-    query:
-      'SELECT * FROM c WHERE c.userId = @userId AND c.phonenumber = @phone ',
+    query: 'SELECT * FROM c WHERE c.userId = @userId AND c.phonenumber=@phone ',
     parameters: queryParams,
   };
 
