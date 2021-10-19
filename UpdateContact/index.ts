@@ -1,6 +1,6 @@
 import {AzureFunction, Context, HttpRequest} from '@azure/functions';
 import {contactRecord} from '../models/contact-Record';
-import {phoneValidator} from '../Common/Utils';
+import {isPhoneValid} from '../Common/Utils';
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest,
@@ -8,8 +8,7 @@ const httpTrigger: AzureFunction = async function (
 ): Promise<void> {
   req.body = {name: 'promi', surname: 'kelly', phonenumber: '0672345993'};
   const updateContact = req.body as contactRecord;
-  const completed = req.body.completed;
-  let numStatus = await phoneValidator(
+  let numberStatus = await isPhoneValid(
     req.body.phonenumber,
     context.bindings.inputDocument[0].userId
   );
@@ -21,7 +20,7 @@ const httpTrigger: AzureFunction = async function (
       surname: updateContact.surname,
       phonenumber: updateContact.phonenumber,
     } as contactRecord;
-    if (numStatus) {
+    if (numberStatus) {
       context.bindings.outputDocument = context.bindings.inputDocument[0];
       context.bindings.outputDocument.name = contRecord.name;
       context.bindings.outputDocument.surname = contRecord.surname;
@@ -33,13 +32,13 @@ const httpTrigger: AzureFunction = async function (
       };
     } else {
       context.res = {
-        status: 404,
+        status: 400,
         body: 'invalid phone number',
       };
     }
   } else {
     context.res = {
-      status: 404,
+      status: 400,
     };
   }
 };
