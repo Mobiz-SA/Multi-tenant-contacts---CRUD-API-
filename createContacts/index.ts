@@ -1,25 +1,20 @@
 import {AzureFunction, Context, HttpRequest} from '@azure/functions';
 import {contactRecord} from '../models/contact-Record';
-import {newContact} from '../models/new-Contact';
-import {getUserId, GuidClass, isPhoneValid} from '../Common/Utils';
-import {PhoneNumberUtil} from 'google-libphonenumber';
+import {getUserId, isPhoneValid} from '../Common/Utils';
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  let idValue = new GuidClass();
-  let idTemp = JSON.stringify(idValue.id);
-
-  const userTemp = getUserId();
-  const newContat_ = req.body as newContact;
-  let numberStatus = await isPhoneValid(req.body.phonenumber, userTemp);
+  const userId = req.params.userId;
+  const newContat_ = req.body as contactRecord;
+  let numberStatus = await isPhoneValid(req.body.phonenumber, userId);
   if (numberStatus) {
     if (newContat_ && newContat_.surname && newContat_.name) {
       context.bindings.outputDocument = {
         // create a random ID
-        id: idTemp.slice(10, idTemp.length - 2),
-        userId: userTemp,
+        id: getUserId(),
+        userId: userId,
         name: newContat_.name,
         surname: newContat_.surname,
         phonenumber: newContat_.phonenumber,
@@ -30,7 +25,7 @@ const httpTrigger: AzureFunction = async function (
       };
     } else {
       context.res = {
-        status: 400,
+        status: 422,
       };
       context.log.error(
         'Create new contact failed, invalid input.',
@@ -41,7 +36,7 @@ const httpTrigger: AzureFunction = async function (
   } else {
     context.log('phonenumber invalid or already exist');
     context.res = {
-      status: 400,
+      status: 422,
     };
   }
 };
