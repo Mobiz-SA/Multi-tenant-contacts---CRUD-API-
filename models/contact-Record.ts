@@ -1,6 +1,7 @@
 import {Guid} from 'guid-typescript';
+
 export interface contactRecord {
-  id: string;
+  id: Guid;
   userId: string;
   name: string;
   surname: string;
