@@ -1,5 +1,5 @@
 import {CosmosClient, SqlParameter} from '@azure/cosmos';
-import {getUserId} from '../Common/Utils';
+import {generateGuid} from '../Common/Utils';
 import {contactRecord} from '../models/contact-Record';
 
 function getCosmosDbContainer() {
@@ -11,7 +11,7 @@ function getCosmosDbContainer() {
   return container;
 }
 
-export async function getContact(id = '', userId = ''): Promise<any> {
+export async function getContact(id = '', userId = ''): Promise<contactRecord> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [
     {name: '@userId', value: userId},
@@ -27,7 +27,7 @@ export async function getContact(id = '', userId = ''): Promise<any> {
     .query(sqlQuery)
     .fetchAll();
 
-  return contactRecord;
+  return contactRecord as unknown as contactRecord;
 }
 export async function getAllContact(userId: string): Promise<contactRecord[]> {
   const container = getCosmosDbContainer();
@@ -52,10 +52,10 @@ export async function getAllContact(userId: string): Promise<contactRecord[]> {
     } as contactRecord;
   });
 }
-export async function isNumberInDatabase(
+export async function findByPhone(
   phone: string,
   userId: string
-): Promise<any> {
+): Promise<number> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [
     {name: '@userId', value: userId},
@@ -71,5 +71,5 @@ export async function isNumberInDatabase(
     .query(sqlQuery)
     .fetchAll();
 
-  return contactRecord;
+  return contactRecord.length;
 }
