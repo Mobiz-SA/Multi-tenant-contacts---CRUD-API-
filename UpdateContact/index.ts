@@ -11,7 +11,11 @@ const httpTrigger: AzureFunction = async function (
     req.body.phonenumber,
     context.bindings.inputDocument[0].userId
   );
-  if (context.bindings.inputDocument) {
+  if (!context.bindings.inputDocument) {
+    context.res = {
+      status: 422,
+    };
+  } else {
     const contactRecord = {
       id: context.bindings.inputDocument[0].id,
       userId: context.bindings.inputDocument[0].userId,
@@ -19,22 +23,18 @@ const httpTrigger: AzureFunction = async function (
       surname: updateContact.surname,
       phonenumber: updateContact.phonenumber,
     } as contactRecord;
-    if (numberStatus) {
+    if (!numberStatus) {
+      context.res = {
+        status: 422,
+        body: 'invalid phone number or it already exist',
+      };
+    } else {
       context.bindings.outputDocument = contactRecord;
       context.res = {
         status: 200,
         body: context.bindings.outputDocument,
       };
-    } else {
-      context.res = {
-        status: 422,
-        body: 'invalid phone number or it already exist',
-      };
     }
-  } else {
-    context.res = {
-      status: 422,
-    };
   }
 };
 

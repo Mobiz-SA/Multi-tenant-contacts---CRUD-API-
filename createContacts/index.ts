@@ -1,27 +1,27 @@
 import {AzureFunction, Context, HttpRequest} from '@azure/functions';
 import {contactRecord} from '../models/contact-Record';
-import {getUserId, isPhoneValid} from '../Common/Utils';
+import {generateGuid, isPhoneValid} from '../Common/Utils';
 
 const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
   const userId = req.params.userId;
-  const newContat_ = req.body as contactRecord;
+  const newContact = req.body as contactRecord;
   let numberStatus = await isPhoneValid(req.body.phonenumber, userId);
   if (numberStatus) {
-    if (newContat_ && newContat_.surname && newContat_.name) {
+    if (newContact && newContact.surname && newContact.name) {
       context.bindings.outputDocument = {
         // create a random ID
-        id: getUserId(),
+        id: generateGuid(),
         userId: userId,
-        name: newContat_.name,
-        surname: newContat_.surname,
-        phonenumber: newContat_.phonenumber,
+        name: newContact.name,
+        surname: newContact.surname,
+        phonenumber: newContact.phonenumber,
       } as contactRecord;
       context.res = {
         status: 200,
-        body: newContat_,
+        body: newContact,
       };
     } else {
       context.res = {
@@ -30,7 +30,7 @@ const httpTrigger: AzureFunction = async function (
       context.log.error(
         'Create new contact failed, invalid input.',
         context.invocationId,
-        JSON.stringify(newContat_)
+        JSON.stringify(newContact)
       );
     }
   } else {
@@ -38,6 +38,37 @@ const httpTrigger: AzureFunction = async function (
     context.res = {
       status: 422,
     };
+  }
+
+  if (!numberStatus) {
+    context.log('phonenumber invalid or already exist');
+    context.res = {
+      status: 422,
+    };
+  } else {
+    if (!(newContact && newContact.surname && newContact.name)) {
+      context.res = {
+        status: 422,
+      };
+      context.log.error(
+        'Create new contact failed, invalid input.',
+        context.invocationId,
+        JSON.stringify(newContact)
+      );
+    } else {
+      context.bindings.outputDocument = {
+        // create a random ID
+        id: generateGuid(),
+        userId: userId,
+        name: newContact.name,
+        surname: newContact.surname,
+        phonenumber: newContact.phonenumber,
+      } as contactRecord;
+      context.res = {
+        status: 200,
+        body: newContact,
+      };
+    }
   }
 };
 

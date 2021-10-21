@@ -1,8 +1,8 @@
 import {PhoneNumberUtil} from 'google-libphonenumber';
 import {Guid} from 'guid-typescript';
-import {isNumberInDatabase} from '../DataAccess/contactList';
+import {findByPhone} from '../DataAccess/contactList';
 
-export function getUserId() {
+export function generateGuid() {
   let id = Guid.create();
   return id;
 }
@@ -13,14 +13,14 @@ export async function isPhoneValid(
   const phoneUtil = PhoneNumberUtil.getInstance();
   const number = phoneUtil.parseAndKeepRawInput(phonenumber, 'ZA');
 
-  if (phoneUtil.isValidNumber(number)) {
-    const count = await isNumberInDatabase(phonenumber, userTemp);
-    if (count.length > 0) {
+  if (!phoneUtil.isValidNumber(number)) {
+    return false;
+  } else {
+    const count = await findByPhone(phonenumber, userTemp);
+    if (count > 0) {
       return false;
     } else {
       return true;
     }
-  } else {
-    return false;
   }
 }
