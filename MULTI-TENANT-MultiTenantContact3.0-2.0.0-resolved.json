@@ -15,7 +15,7 @@
     }
   ],
   "paths": {
-    "/createContacts": {
+    "/CreateContacts": {
       "post": {
         "description": "creates a new contact from the contact list database",
         "requestBody": {
