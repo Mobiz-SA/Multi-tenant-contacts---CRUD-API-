@@ -5,21 +5,12 @@
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
-      "methods": ["post"]
+      "methods": ["get", "post"]
     },
     {
       "type": "http",
       "direction": "out",
       "name": "res"
-    },
-    {
-      "type": "cosmosDB",
-      "direction": "in",
-      "name": "inputDocument",
-      "databaseName": "my-database",
-      "collectionName": "my-container1",
-      "connectionStringSetting": "CosmosDbConnectionStr",
-      "sqlQuery": "select * from c where c.id ={id} AND c.userId={userId}"
     },
     {
       "type": "cosmosDB",
@@ -31,5 +22,5 @@
       "connectionStringSetting": "CosmosDbConnectionStr"
     }
   ],
-  "scriptFile": "../dist/UpdateContact/index.js"
+  "scriptFile": "../dist/createContacts/index.js"
 }
