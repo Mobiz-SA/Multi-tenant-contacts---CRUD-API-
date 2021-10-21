@@ -9,37 +9,6 @@ const httpTrigger: AzureFunction = async function (
   const userId = req.params.userId;
   const newContact = req.body as contactRecord;
   let numberStatus = await isPhoneValid(req.body.phonenumber, userId);
-  if (numberStatus) {
-    if (newContact && newContact.surname && newContact.name) {
-      context.bindings.outputDocument = {
-        // create a random ID
-        id: generateGuid(),
-        userId: userId,
-        name: newContact.name,
-        surname: newContact.surname,
-        phonenumber: newContact.phonenumber,
-      } as contactRecord;
-      context.res = {
-        status: 200,
-        body: newContact,
-      };
-    } else {
-      context.res = {
-        status: 422,
-      };
-      context.log.error(
-        'Create new contact failed, invalid input.',
-        context.invocationId,
-        JSON.stringify(newContact)
-      );
-    }
-  } else {
-    context.log('phonenumber invalid or already exist');
-    context.res = {
-      status: 422,
-    };
-  }
-
   if (!numberStatus) {
     context.log('phonenumber invalid or already exist');
     context.res = {
