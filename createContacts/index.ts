@@ -6,7 +6,7 @@ const httpTrigger: AzureFunction = async function (
   context: Context,
   req: HttpRequest
 ): Promise<void> {
-  const userId = req.params.userId;
+  const userId = req.query.userId;
   const newContact = req.body as contactRecord;
   let numberStatus = await isPhoneValid(req.body.phonenumber, userId);
   if (!numberStatus) {
@@ -15,7 +15,7 @@ const httpTrigger: AzureFunction = async function (
       status: 422,
     };
   } else {
-    if (!(newContact && newContact.surname && newContact.name)) {
+    if (!(newContact && newContact.surname && newContact.name && userId)) {
       context.res = {
         status: 422,
       };
@@ -35,7 +35,7 @@ const httpTrigger: AzureFunction = async function (
       } as contactRecord;
       context.res = {
         status: 200,
-        body: newContact,
+        body: 'contact created',
       };
     }
   }

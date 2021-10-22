@@ -1,5 +1,4 @@
 import {CosmosClient, SqlParameter} from '@azure/cosmos';
-import {generateGuid} from '../Common/Utils';
 import {contactRecord} from '../models/contact-Record';
 
 function getCosmosDbContainer() {
@@ -11,7 +10,7 @@ function getCosmosDbContainer() {
   return container;
 }
 
-export async function getContact(id = '', userId = ''): Promise<contactRecord> {
+export async function getContact(id: string, userId: string): Promise<any> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [
     {name: '@userId', value: userId},
@@ -23,11 +22,18 @@ export async function getContact(id = '', userId = ''): Promise<contactRecord> {
     parameters: queryParams,
   };
 
-  const {resources: contactRecord} = await container.items
+  const {resources: contactRecordInfo} = await container.items
     .query(sqlQuery)
     .fetchAll();
-
-  return contactRecord as unknown as contactRecord;
+  return contactRecordInfo.map((item) => {
+    return {
+      id: item.id,
+      userId: item.userId,
+      name: item.name,
+      surname: item.surname,
+      phonenumber: item.phonenumber,
+    } as contactRecord;
+  });
 }
 export async function getAllContact(userId: string): Promise<contactRecord[]> {
   const container = getCosmosDbContainer();
@@ -52,10 +58,7 @@ export async function getAllContact(userId: string): Promise<contactRecord[]> {
     } as contactRecord;
   });
 }
-export async function findByPhone(
-  phone: string,
-  userId: string
-): Promise<number> {
+export async function findByPhone(phone: string, userId: string): Promise<any> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [
     {name: '@userId', value: userId},
@@ -71,5 +74,5 @@ export async function findByPhone(
     .query(sqlQuery)
     .fetchAll();
 
-  return contactRecord.length;
+  return contactRecord;
 }
