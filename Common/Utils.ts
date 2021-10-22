@@ -3,7 +3,7 @@ import {Guid} from 'guid-typescript';
 import {findByPhone} from '../DataAccess/contactList';
 
 export function generateGuid() {
-  let id = Guid.create();
+  let id = Guid.create().toString();
   return id;
 }
 export async function isPhoneValid(
@@ -12,12 +12,11 @@ export async function isPhoneValid(
 ): Promise<boolean> {
   const phoneUtil = PhoneNumberUtil.getInstance();
   const number = phoneUtil.parseAndKeepRawInput(phonenumber, 'ZA');
-
   if (!phoneUtil.isValidNumber(number)) {
     return false;
   } else {
     const count = await findByPhone(phonenumber, userTemp);
-    if (count > 0) {
+    if (count.length > 0) {
       return false;
     } else {
       return true;
