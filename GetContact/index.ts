@@ -6,7 +6,7 @@ const httpTrigger: AzureFunction = async function (
   req: HttpRequest
 ): Promise<void> {
   const contact = await getContact(req.query.id, req.query.userId);
-  if (contact && contact.length > 0) {
+  if (contact) {
     context.res = {
       status: 200,
       body: contact,
