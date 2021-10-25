@@ -10,7 +10,10 @@ function getCosmosDbContainer() {
   return container;
 }
 
-export async function getContact(id: string, userId: string): Promise<any> {
+export async function getContact(
+  id: string,
+  userId: string
+): Promise<contactRecord> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [
     {name: '@userId', value: userId},
@@ -25,17 +28,10 @@ export async function getContact(id: string, userId: string): Promise<any> {
   const {resources: contactRecordInfo} = await container.items
     .query(sqlQuery)
     .fetchAll();
-  return contactRecordInfo.map((item) => {
-    return {
-      id: item.id,
-      userId: item.userId,
-      name: item.name,
-      surname: item.surname,
-      phonenumber: item.phonenumber,
-    } as contactRecord;
-  });
+
+  return contactRecordInfo[0];
 }
-export async function getAllContact(userId: string): Promise<contactRecord[]> {
+export async function getAllContacts(userId: string): Promise<contactRecord[]> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [{name: '@userId', value: userId}];
 
@@ -58,7 +54,10 @@ export async function getAllContact(userId: string): Promise<contactRecord[]> {
     } as contactRecord;
   });
 }
-export async function findByPhone(phone: string, userId: string): Promise<any> {
+export async function findByPhone(
+  phone: string,
+  userId: string
+): Promise<contactRecord> {
   const container = getCosmosDbContainer();
   const queryParams: SqlParameter[] = [
     {name: '@userId', value: userId},
@@ -74,5 +73,7 @@ export async function findByPhone(phone: string, userId: string): Promise<any> {
     .query(sqlQuery)
     .fetchAll();
 
-  return contactRecord;
+  // return contactRecord;
+
+  return contactRecord[0];
 }
