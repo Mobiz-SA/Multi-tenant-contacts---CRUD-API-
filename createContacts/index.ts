@@ -14,31 +14,33 @@ const httpTrigger: AzureFunction = async function (
     context.res = {
       status: 422,
     };
-  } else {
-    if (!(newContact && newContact.surname && newContact.name && userId)) {
-      context.res = {
-        status: 422,
-      };
-      context.log.error(
-        'Create new contact failed, invalid input.',
-        context.invocationId,
-        JSON.stringify(newContact)
-      );
-    } else {
-      context.bindings.outputDocument = {
-        // create a random ID
-        id: generateGuid(),
-        userId: userId,
-        name: newContact.name,
-        surname: newContact.surname,
-        phonenumber: newContact.phonenumber,
-      } as contactRecord;
-      context.res = {
-        status: 200,
-        body: 'contact created',
-      };
-    }
+    return;
   }
+
+  if (!(newContact && newContact.surname && newContact.name && userId)) {
+    context.res = {
+      status: 422,
+    };
+    context.log.error(
+      'Create new contact failed, invalid input.',
+      context.invocationId,
+      JSON.stringify(newContact)
+    );
+    return;
+  }
+
+  context.bindings.outputDocument = {
+    // create a random ID
+    id: generateGuid(),
+    userId: userId,
+    name: newContact.name,
+    surname: newContact.surname,
+    phonenumber: newContact.phonenumber,
+  } as contactRecord;
+  context.res = {
+    status: 200,
+    body: 'contact created',
+  };
 };
 
 export default httpTrigger;
