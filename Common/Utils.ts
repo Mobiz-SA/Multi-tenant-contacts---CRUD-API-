@@ -16,7 +16,7 @@ export async function isPhoneValid(
     return false;
   } else {
     const count = await findByPhone(phonenumber, userTemp);
-    if (count.length > 0) {
+    if (count) {
       return false;
     } else {
       return true;
