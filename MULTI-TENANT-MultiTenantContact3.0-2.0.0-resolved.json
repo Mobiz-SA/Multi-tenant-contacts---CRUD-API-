@@ -1,0 +1,217 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Multi tenant API",
+    "description": "An API thal allows users to create a contact, able to update an existing contact, view a list of all contacts and show a specific contact information",
+    "contact": {
+      "name": "Sithembiso",
+      "email": "sithembiso@mobiz.co"
+    },
+    "version": "2.0.0"
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "paths": {
+    "/CreateContacts": {
+      "post": {
+        "description": "creates a new contact from the contact list database",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/contact"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/contact"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successfully created contact."
+          },
+          "422": {
+            "description": "unsuccessful creation of the contact."
+          }
+        }
+      }
+    },
+    "/GetAllContacts": {
+      "get": {
+        "description": "obtains all the contacts belonging to a specific user in the database",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The id of the contact that is used for partitioning may be similar for more than one contact",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "0034ref2020"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successfully pull all user contact information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/contacts"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "unsuccessful contacts retrieval"
+          }
+        }
+      }
+    },
+    "/GetContact": {
+      "get": {
+        "description": "show specific contact information that is in the database",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The unique id of the contact",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "opedr345ose@dmd@"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The id of the contact that is used for partitioning may be similar for more than one contact",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "0034ref2020"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/contacts"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "unsuccessful contact retrieval"
+          }
+        }
+      }
+    },
+    "/UpdateContact": {
+      "post": {
+        "description": "changes the existing contact information on the database",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "description": "The unique id of the contact",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "opedr345ose@dmd@"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "description": "The id of the contact that is used for partitioning may be similar for more than one contact",
+            "required": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string",
+              "example": "0034ref2020"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/contact"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/contact"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "successfully updated a contact."
+          },
+          "404": {
+            "description": "unsuccessful contact updating"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "contacts": {
+        "type": "array",
+        "description": "Array of contact information",
+        "items": {
+          "$ref": "#/components/schemas/contact"
+        }
+      },
+      "contact": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "peter123"
+          },
+          "userId": {
+            "type": "string",
+            "example": "fever2020"
+          },
+          "name": {
+            "type": "string",
+            "example": "Samuel"
+          },
+          "surname": {
+            "type": "string",
+            "example": "Willard"
+          },
+          "phonenumber": {
+            "type": "string",
+            "example": "0713276358"
+          }
+        },
+        "description": "Model containing contact information"
+      }
+    }
+  }
+}

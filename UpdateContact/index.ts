@@ -1,46 +1,42 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions"
-import { contactRecord } from "../models/contact-Record";
-import { editTodoItem } from "../DataAccess/contactList";
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    context.log.info('Edit todo item started.');
-    
-   const id = "2021-10-11B16:30:04.340Z45308239";
-   const id2="2021-10-08T11:08:04.340Z45308239";
-   req.body={name:"Bby",surname:"Darling",phonenumber:"0413674543"};
-    const upCont = req.body as contactRecord;
-    context.log(upCont);
-    if(upCont&& upCont.name && upCont.surname&& upCont.phonenumber) {
-        const contRecord = {
-            id: id,
-            name: upCont.name,
-            surname: upCont.surname,
-            phonenumber:upCont.phonenumber
-        } as contactRecord;
-        context.log(contRecord);
-        try{
-            await editTodoItem(id2,contRecord);
-            context.res = {
-                status: 200,
-                body: contRecord
-            };
-        }catch(error){
-            if(error.message.includes("Entity with the specified id does not exist in the system")){
-                context.log.info('Edit todo item middle point.');
-                context.res = {
-                    status:404
+import {AzureFunction, Context, HttpRequest} from '@azure/functions';
+import {contactRecord} from '../models/contact-Record';
+import {isPhoneValid} from '../Common/Utils';
+const httpTrigger: AzureFunction = async function (
+  context: Context,
+  req: HttpRequest,
+  todo
+): Promise<void> {
+  const updateContact = req.body as contactRecord;
+  let numberStatus = await isPhoneValid(
+    req.body.phonenumber,
+    context.bindings.inputDocument[0].userId
+  );
+  if (!context.bindings.inputDocument) {
+    context.res = {
+      status: 422,
+    };
+    return;
+  }
 
-                };
-            } else {
-                throw error;
-            }
-        }
-    } else {
-        context.res = {
-            status: 400
-        };
-    }
-    context.log.info('Edit todo item completed.');
-    context.done();
+  const contactRecord = {
+    id: context.bindings.inputDocument[0].id,
+    userId: context.bindings.inputDocument[0].userId,
+    name: updateContact.name,
+    surname: updateContact.surname,
+    phonenumber: updateContact.phonenumber,
+  } as contactRecord;
+  if (!numberStatus) {
+    context.res = {
+      status: 422,
+      body: 'invalid phone number or it already exist',
+    };
+    return;
+  }
+  context.bindings.outputDocument = contactRecord;
+  context.res = {
+    status: 200,
+    body: context.bindings.outputDocument,
+  };
 };
 
 export default httpTrigger;

@@ -1,23 +1,22 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions"
-import { getAllTodoItems } from "../DataAccess/contactList";
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-    context.log.info('Get all todo items started');
-    
-    const cont = await getAllTodoItems();
-    context.log.info(cont);
-    if(cont && cont.length > 0) {
-        context.res = {
-            status: 200,
-            body: cont
-        };
-    } else {
-        context.res = {
-            status: 204
-        };
-    }
+import {AzureFunction, Context, HttpRequest} from '@azure/functions';
+import {getAllContact} from '../DataAccess/contactList';
+const httpTrigger: AzureFunction = async function (
+  context: Context,
+  req: HttpRequest
+): Promise<void> {
+  const contact = await getAllContact(req.query.userId);
+  if (contact && contact.length > 0) {
+    context.res = {
+      status: 200,
+      body: contact,
+    };
+  } else {
+    context.res = {
+      status: 404,
+    };
+  }
 
-    context.log.info('Get all todo items completed.');
-
+  context.log.info('Get all contacts completed.');
 };
 
 export default httpTrigger;
